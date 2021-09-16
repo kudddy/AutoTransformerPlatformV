@@ -1,6 +1,6 @@
 import logging
 import asyncio
-
+import time
 from ..plugins.responder.sberauto import \
     parse_response, generate_url, \
     generate_url_for_mobile, generate_text_form
@@ -10,7 +10,9 @@ from ..plugins.duckling.typonder import replace_typos
 from ..plugins.config import cfg
 from ..plugins.helper import async_get
 
-tlg_logger = cfg.app.url.tlg
+tlg_logger: str = cfg.app.url.tlg
+
+use_tlg_logger: bool = cfg.app.main.use_tlg_logger
 
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
@@ -38,11 +40,16 @@ def inputter(res: object):
         if brand_id or model_id or city_id:
             # запускаем локальный цикл событий
 
+            start = time.time()
+
             responses = loop.run_until_complete(async_get(brand_id=brand_id,
                                                           city_id=city_id,
                                                           model_id=model_id,
                                                           year_from=year_from,
                                                           year_to=year_to))
+            end = time.time()
+
+            log.debug('response from sberauto took {:.3f} ms'.format((end - start) * 1000.0))
 
             all_responses: list = []
             for data in responses:
@@ -54,9 +61,9 @@ def inputter(res: object):
 
         else:
             status = False
-
-            logger_string: str = "☢️ по токету - {} ничего не найдено".format(text)
-            send_message(url=tlg_logger, text=logger_string, chat_id=81432612)
+            if use_tlg_logger:
+                logger_string: str = "☢️ по токету - {} ничего не найдено".format(text)
+                send_message(url=tlg_logger, text=logger_string, chat_id=81432612)
             log.debug(f'function done work fine but nothing found')
             return {"MESSAGE_NAME": "GET_DUCKLING_RESULT",
                     "STATUS": status,
@@ -96,8 +103,9 @@ def inputter(res: object):
                 done_url = "https://sberauto.com/cars?"
 
         # TODO слишком влияет на производительность
-        logger_string: str = "✅по токету - {} OK".format(text)
-        send_message(url=tlg_logger, text=logger_string, chat_id=81432612)
+        if use_tlg_logger:
+            logger_string: str = "✅по токету - {} OK".format(text)
+            send_message(url=tlg_logger, text=logger_string, chat_id=81432612)
 
         log.debug(f'function done work fine')
 
@@ -129,8 +137,9 @@ def inputter(res: object):
                   "token - {}".format(text),
                   e)
         status = False
-        logger_string: str = "🛑 по токету - {} ошибка - {}".format(text, str(e)[0:4095])
-        send_message(url=tlg_logger, text=logger_string, chat_id=81432612)
+        if use_tlg_logger:
+            logger_string: str = "🛑 по токету - {} ошибка - {}".format(text, str(e)[0:4095])
+            send_message(url=tlg_logger, text=logger_string, chat_id=81432612)
         logging.info(f'function done work incorrect')
         return {"MESSAGE_NAME": "GET_DUCKLING_RESULT",
                 "STATUS": status,

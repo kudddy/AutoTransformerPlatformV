@@ -3,12 +3,16 @@ import logging
 
 # from aiohttp_requests import requests
 from requests import request
+
+from ..helper import timing
+
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
 log.setLevel(logging.DEBUG)
 
 
+@timing
 def send_message(url: str,
                  chat_id: int,
                  text: str,

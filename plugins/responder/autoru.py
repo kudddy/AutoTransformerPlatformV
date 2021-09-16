@@ -1,17 +1,17 @@
 from json import dumps
-from aiohttp_requests import requests as async_req
 from requests import request
 
 from ..config import cfg
 from ..loader import marks, models, citys
 from ..helper import is_true
 from ...persistants.request_info import mixer_headers_auto_ru
+from ..helper import timing
 
 url_auto_ru: str = cfg.app.url.autoru
 
 
+@timing
 def get_resp_from_yandex_systems(payload: dict):
-
     response = request("POST", url_auto_ru, headers=mixer_headers_auto_ru(), data=dumps(payload))
 
     return response.json()
