@@ -8,6 +8,7 @@ from prometheus_client import Summary
 from python_function_model import FunctionRequest, FunctionResponse
 
 from ..plugins.inputer import inputter
+from ..plugins.helper import timing
 
 from .apig_sdk import signer
 
@@ -18,17 +19,17 @@ app_secret = os.environ.get('APP_SECRET')
 
 
 # Метод handler. Этот метод будет вызываться при вызове функции
-@REQUEST_TIME.time()
+# @REQUEST_TIME.time()
+@timing
 def handle(request: FunctionRequest):
-    
     payload = loads(request.payload)
     resp = inputter(payload)
-    
+
     return FunctionResponse(
         resp
-    ,
-    200,
-    {"Content-Type": "application/json"})
+        ,
+        200,
+        {"Content-Type": "application/json"})
 
 
 # Аутентификация запроса

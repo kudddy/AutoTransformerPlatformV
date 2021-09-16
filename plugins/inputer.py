@@ -12,10 +12,16 @@ from ..plugins.helper import async_get
 
 tlg_logger = cfg.app.url.tlg
 
+logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger(__name__)
+
+log.setLevel(logging.DEBUG)
+
 loop = asyncio.get_event_loop()
 
 
 def inputter(res: object):
+    log.debug(f'start process message with payload - {res}')
     result: dict = {}
     search_res_text_from = None
 
@@ -23,7 +29,7 @@ def inputter(res: object):
 
     text = replace_typos(text)
     try:
-        logging.info("message_name - %r info - %r", "GET_DUCKLING_RESULT", "token - {}".format(text))
+        log.debug("message_name - %r info - %r", "GET_DUCKLING_RESULT", "token - {}".format(text))
 
         brand_id, model_id, city_id, year_from, year_to = get_search_res_yandex(text)
 
@@ -51,6 +57,7 @@ def inputter(res: object):
 
             logger_string: str = "☢️ по токету - {} ничего не найдено".format(text)
             send_message(url=tlg_logger, text=logger_string, chat_id=81432612)
+            log.debug(f'function done work fine but nothing found')
             return {"MESSAGE_NAME": "GET_DUCKLING_RESULT",
                     "STATUS": status,
                     "PAYLOAD": {
@@ -92,6 +99,8 @@ def inputter(res: object):
         logger_string: str = "✅по токету - {} OK".format(text)
         send_message(url=tlg_logger, text=logger_string, chat_id=81432612)
 
+        log.debug(f'function done work fine')
+
         return {"MESSAGE_NAME": "GET_DUCKLING_RESULT",
                 "STATUS": status,
                 "PAYLOAD": {
@@ -115,13 +124,14 @@ def inputter(res: object):
                     "description": "OK"
                 }}
     except Exception as e:
-        logging.info("message_name - %r info - %r error - %r",
-                     "GET_DUCKLING_RESULT",
-                     "token - {}".format(text),
-                     e)
+        log.debug("message_name - %r info - %r error - %r",
+                  "GET_DUCKLING_RESULT",
+                  "token - {}".format(text),
+                  e)
         status = False
         logger_string: str = "🛑 по токету - {} ошибка - {}".format(text, str(e)[0:4095])
         send_message(url=tlg_logger, text=logger_string, chat_id=81432612)
+        logging.info(f'function done work incorrect')
         return {"MESSAGE_NAME": "GET_DUCKLING_RESULT",
                 "STATUS": status,
                 "PAYLOAD": {
