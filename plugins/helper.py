@@ -64,7 +64,7 @@ async def get_cars_from_sberauto(brand_id: int or bool,
             "is_new": None,
             "catalog": [
                 {
-                    "brand_id": brand_id,
+                    "brand_id": brand_id if brand_id else None,
                     "model_id": [model_id] if model_id else [],
                     "folder_id": []
                 }
@@ -78,8 +78,6 @@ async def get_cars_from_sberauto(brand_id: int or bool,
     }
 
     response = await async_req.post(url, headers=headers_sberauto, data=dumps(payload), ssl=False)
-
-    # response = request("POST", url, headers=headers_sberauto, data=dumps(payload), ssl=False)
 
     return await response.json()
 

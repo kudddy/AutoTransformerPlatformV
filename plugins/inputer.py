@@ -49,7 +49,7 @@ def inputter(res: object):
 
         # TODO подумать насчет этого условия
 
-        if brand_id or model_id or city_id:
+        if brand_id or model_id or city_id or year_from or year_to:
             # запускаем локальный цикл событий
 
             start = time.time()
@@ -83,7 +83,8 @@ def inputter(res: object):
                 # TODO грязно
                 status = False
                 if use_tlg_logger:
-                    logger_string: str = "☢️ по токету - {} ничего не найдено".format(text)
+                    logger_string: str = "☢️ токен - {} классифицирован, но в базе sberauto ничего не найдено".format(
+                        text)
                     send_message(url=tlg_logger, text=logger_string, chat_id=81432612)
                 log.debug(f'function done work fine but nothing found')
                 return {"MESSAGE_NAME": "GET_DUCKLING_RESULT",
@@ -128,12 +129,6 @@ def inputter(res: object):
                                         year_from,
                                         year_to)
             # генерируем текстовую форму
-
-            # search_res_text_from = generate_text_form(brand_id,
-            #                                           city_id,
-            #                                           model_id,
-            #                                           year_from,
-            #                                           year_to)
 
         else:
             if cfg.app.main.redirect_to_mobile:
