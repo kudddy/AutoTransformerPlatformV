@@ -7,7 +7,10 @@ def load_config(filename: str):
     return config
 
 
-config = load_config('function/config/prod.yaml')
+try:
+    config = load_config('function/config/prod.yaml')
+except:
+    config = load_config('config/prod.yaml')
 
 
 class ConfigObj(object):

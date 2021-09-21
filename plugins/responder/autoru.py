@@ -1,11 +1,18 @@
 from json import dumps
 from requests import request
 
-from ..config import cfg
-from ..loader import marks, models, citys
-from ..helper import is_true
-from ...persistants.request_info import mixer_headers_auto_ru
-from ..helper import timing
+try:
+    from ..config import cfg
+    from ..loader import marks, models, citys
+    from ..helper import is_true
+    from ...persistants.request_info import mixer_headers_auto_ru
+    from ..helper import timing
+except Exception as e:
+    from plugins.config import cfg
+    from plugins.loader import marks, models, citys
+    from plugins.helper import is_true
+    from persistants.request_info import mixer_headers_auto_ru
+    from plugins.helper import timing
 
 url_auto_ru: str = cfg.app.url.autoru
 

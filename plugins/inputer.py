@@ -1,14 +1,26 @@
 import logging
 import asyncio
 import time
-from ..plugins.responder.sberauto import \
-    parse_response, generate_url, \
-    generate_url_for_mobile, generate_text_form
-from ..plugins.responder.autoru import get_search_res_yandex
-from ..plugins.responder.tlg import send_message
-from ..plugins.duckling.typonder import replace_typos
-from ..plugins.config import cfg
-from ..plugins.helper import async_get
+
+try:
+    from ..plugins.responder.sberauto import \
+        parse_response, generate_url, \
+        generate_url_for_mobile, generate_text_form
+    from ..plugins.responder.autoru import get_search_res_yandex
+    from ..plugins.responder.tlg import send_message
+    from ..plugins.duckling.typonder import replace_typos
+    from ..plugins.config import cfg
+    from ..plugins.helper import async_get
+
+except Exception as e:
+    from plugins.responder.sberauto import \
+        parse_response, generate_url, \
+        generate_url_for_mobile, generate_text_form
+    from plugins.responder.autoru import get_search_res_yandex
+    from plugins.responder.tlg import send_message
+    from plugins.duckling.typonder import replace_typos
+    from plugins.config import cfg
+    from plugins.helper import async_get
 
 tlg_logger: str = cfg.app.url.tlg
 
@@ -59,20 +71,47 @@ def inputter(res: object):
                     if response:
                         all_responses.extend(response)
 
+            search_res_text_from = generate_text_form(brand_id=brand_id,
+                                                      city_id=city_id,
+                                                      model_id=model_id,
+                                                      year_from=year_from,
+                                                      year_to=year_to)
+
+            status, min_price, middle_value, max_price, count = parse_response(all_responses)
+
+            if count == 0:
+                # TODO грязно
+                status = False
+                if use_tlg_logger:
+                    logger_string: str = "☢️ по токету - {} ничего не найдено".format(text)
+                    send_message(url=tlg_logger, text=logger_string, chat_id=81432612)
+                log.debug(f'function done work fine but nothing found')
+                return {"MESSAGE_NAME": "GET_DUCKLING_RESULT",
+                        "CODE": 404,
+                        "STATUS": status,
+                        "PAYLOAD": {
+                            "result": {
+                                "search_text_form": search_res_text_from if search_res_text_from else False
+                            },
+                            "description": "nothing found"
+                        }}
+
         else:
+            # TODO Кажется, что в это условие никогда не заходит
             status = False
             if use_tlg_logger:
                 logger_string: str = "☢️ по токету - {} ничего не найдено".format(text)
                 send_message(url=tlg_logger, text=logger_string, chat_id=81432612)
             log.debug(f'function done work fine but nothing found')
             return {"MESSAGE_NAME": "GET_DUCKLING_RESULT",
+                    "CODE": 404,
                     "STATUS": status,
                     "PAYLOAD": {
-                        "result": result,
+                        "result": {
+                            "search_text_form": search_res_text_from if search_res_text_from else False
+                        },
                         "description": "nothing found"
                     }}
-
-        status, min_price, middle_value, max_price, count = parse_response(all_responses)
 
         # проверяем статус от сберавто по поводу найденых авто
         if status:
@@ -90,11 +129,11 @@ def inputter(res: object):
                                         year_to)
             # генерируем текстовую форму
 
-            search_res_text_from = generate_text_form(brand_id,
-                                                      city_id,
-                                                      model_id,
-                                                      year_from,
-                                                      year_to)
+            # search_res_text_from = generate_text_form(brand_id,
+            #                                           city_id,
+            #                                           model_id,
+            #                                           year_from,
+            #                                           year_to)
 
         else:
             if cfg.app.main.redirect_to_mobile:
@@ -111,6 +150,7 @@ def inputter(res: object):
 
         return {"MESSAGE_NAME": "GET_DUCKLING_RESULT",
                 "STATUS": status,
+                "CODE": 200,
                 "PAYLOAD": {
                     "result": {
                         "min_price": min_price,
@@ -142,6 +182,7 @@ def inputter(res: object):
             send_message(url=tlg_logger, text=logger_string, chat_id=81432612)
         logging.info(f'function done work incorrect')
         return {"MESSAGE_NAME": "GET_DUCKLING_RESULT",
+                "CODE": 504,
                 "STATUS": status,
                 "PAYLOAD": {
                     "result": result,
