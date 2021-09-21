@@ -2,7 +2,6 @@ from json import dumps
 from statistics import median
 from urllib.parse import quote
 from aiohttp_requests import requests as async_req
-from requests import request
 try:
     from ..config import cfg
     from ..helper import generate_city_str
@@ -105,7 +104,7 @@ def generate_url_for_mobile(brand_id: int or bool,
         "is_new": None,
         "catalog": [
             {
-                "brand_id": brand_id,
+                "brand_id": brand_id if brand_id else None,
                 "model_id": [model_id] if model_id else []
             }
         ]

@@ -117,11 +117,11 @@ def inputter(res: object):
         # проверяем статус от сберавто по поводу найденых авто
         if status:
             if cfg.app.main.redirect_to_mobile:
-                done_url = generate_url_for_mobile(brand_id,
-                                                   city_id,
-                                                   model_id,
-                                                   year_from,
-                                                   year_to)
+                done_url = generate_url_for_mobile(brand_id=brand_id,
+                                                   city_id=city_id,
+                                                   model_id=model_id,
+                                                   year_from=year_from,
+                                                   year_to=year_to)
             else:
                 done_url = generate_url(brand_id,
                                         city_id,
