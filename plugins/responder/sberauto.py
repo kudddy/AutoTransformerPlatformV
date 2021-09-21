@@ -183,12 +183,12 @@ def generate_text_form(brand_id: int or bool,
         if year_to == year_from:
             done_str += " {} года".format(year_to)
         else:
-            done_str += " от {} до {} года".format(year_to, year_from)
+            done_str += " от {} до {} года".format(year_from, year_to)
 
     if year_to and not year_from:
-        done_str += " от {} года".format(year_to)
+        done_str += " до {} года".format(year_to)
 
     if not year_to and year_from:
-        done_str += " до {} года".format(year_from)
+        done_str += " от {} года".format(year_from)
 
     return done_str.lstrip().rstrip()
