@@ -164,8 +164,8 @@ def generate_text_form(brand_id: int or bool,
     # TODO brand_id не главный и основной критий поиска
     if brand_id:
         done_str += "{}".format(models_revers[brand_id])
-    else:
-        return None
+    # else:
+    #     return None
     if model_id:
         done_str += " {}".format(marks_revers[model_id])
     if city_id:
@@ -191,4 +191,4 @@ def generate_text_form(brand_id: int or bool,
     if not year_to and year_from:
         done_str += " до {} года".format(year_from)
 
-    return done_str
+    return done_str.lstrip().rstrip()

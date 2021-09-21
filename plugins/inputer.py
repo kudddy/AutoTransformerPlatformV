@@ -71,11 +71,11 @@ def inputter(res: object):
                     if response:
                         all_responses.extend(response)
 
-            search_res_text_from = generate_text_form(brand_id,
-                                                      city_id,
-                                                      model_id,
-                                                      year_from,
-                                                      year_to)
+            search_res_text_from = generate_text_form(brand_id=brand_id,
+                                                      city_id=city_id,
+                                                      model_id=model_id,
+                                                      year_from=year_from,
+                                                      year_to=year_to)
 
             status, min_price, middle_value, max_price, count = parse_response(all_responses)
 
