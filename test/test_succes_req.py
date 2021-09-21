@@ -175,20 +175,51 @@ class AioMemTest(unittest.TestCase):
 
         self.assertEqual(year_from, 2015)
 
-    # def test_success_resp_city(self):
-    #     test = {
-    #         "MESSAGE_NAME": "GET_DUCKLING_RESULT",
-    #         "data": {
-    #             "text": "Москва"
-    #         }
-    #     }
+    def test_success_resp_city(self):
+        test = {
+            "MESSAGE_NAME": "GET_DUCKLING_RESULT",
+            "data": {
+                "text": "хочу тачку в Москве"
+            }
+        }
 
-        # res = inputter(test)
-        #
-        # self.assertEqual(res['PAYLOAD']['STATUS'], True)
-        #
-        # search_text_form = res['PAYLOAD']['result']['search_text_form']
-        #
-        # self.assertEqual(search_text_form, "Москва")
+        res = inputter(test)
 
+        self.assertEqual(res['STATUS'], True)
+
+        search_text_form = res['PAYLOAD']['result']['search_text_form']
+
+        self.assertEqual(search_text_form, "Москва")
+
+    def test_success_resp_year_from(self):
+        test = {
+            "MESSAGE_NAME": "GET_DUCKLING_RESULT",
+            "data": {
+                "text": "хочу тачку от 2015 года"
+            }
+        }
+
+        res = inputter(test)
+
+        self.assertEqual(res['STATUS'], True)
+
+        search_text_form = res['PAYLOAD']['result']['search_text_form']
+
+        self.assertEqual(search_text_form, "от 2015 года")
+
+    def test_success_resp_year_to(self):
+        test = {
+            "MESSAGE_NAME": "GET_DUCKLING_RESULT",
+            "data": {
+                "text": "хочу тачку до 2015 года"
+            }
+        }
+
+        res = inputter(test)
+
+        self.assertEqual(res['STATUS'], True)
+
+        search_text_form = res['PAYLOAD']['result']['search_text_form']
+
+        self.assertEqual(search_text_form, "до 2015 года")
 
