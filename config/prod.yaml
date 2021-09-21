@@ -4,6 +4,7 @@ app:
     port: 8080
     redirect_to_mobile: True
     use_tlg_logger: True
+    use_local_config: True
   directory:
     model_path: persistant/w2v/model_hh_fasttext
     stop_words_path: persistant/stopwords.txt

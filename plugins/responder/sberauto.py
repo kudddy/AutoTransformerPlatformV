@@ -3,11 +3,16 @@ from statistics import median
 from urllib.parse import quote
 from aiohttp_requests import requests as async_req
 from requests import request
-
-from ..config import cfg
-from ..helper import generate_city_str
-from ...persistants.request_info import headers_sberauto
-from ..loader import citys_map, marks_revers, models_revers
+try:
+    from ..config import cfg
+    from ..helper import generate_city_str
+    from ...persistants.request_info import headers_sberauto
+    from ..loader import citys_map, marks_revers, models_revers
+except Exception as e:
+    from plugins.config import cfg
+    from plugins.helper import generate_city_str
+    from persistants.request_info import headers_sberauto
+    from plugins.loader import citys_map, marks_revers, models_revers
 
 url = cfg.app.url.sberautogetcars
 
@@ -75,7 +80,7 @@ def parse_response(search_res: list):
     else:
         status = False
 
-    return status, min_price, middle_value, max_price, count
+    return status, min_price, middle_value, max_price, count if count else 0
 
 
 def encode_uri_component(formdata: str):

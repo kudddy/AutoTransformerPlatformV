@@ -4,9 +4,12 @@ from json import dumps
 import logging
 from aiohttp_requests import requests as async_req
 
-
-from ..persistants.request_info import headers_sberauto
-from ..plugins.config import cfg
+try:
+    from ..persistants.request_info import headers_sberauto
+    from ..plugins.config import cfg
+except Exception as e:
+    from persistants.request_info import headers_sberauto
+    from plugins.config import cfg
 
 
 url = cfg.app.url.sberautogetcars

@@ -3,8 +3,10 @@ import logging
 
 # from aiohttp_requests import requests
 from requests import request
-
-from ..helper import timing
+try:
+    from ..helper import timing
+except Exception as e:
+    from plugins.helper import timing
 
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
