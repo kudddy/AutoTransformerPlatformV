@@ -146,7 +146,11 @@ class SberAutoProcessor(SberAutoLoader):
             city_str += "&city={}".format(city)
         return city_str
 
-    def generate_url_for_mobile(self):
+    def generate_url_for_mobile(self, find_anything: bool):
+
+        if not find_anything:
+            return "https://sberauto.com/app/chat/car_select"
+
         payload = {
             "engine_type_code": [],
             "transmission_code": [],
@@ -177,7 +181,9 @@ class SberAutoProcessor(SberAutoLoader):
                     form_data_string += "&{}={}".format(k, v)
         return redirect_url_mobile + "?{}".format(form_data_string[1:])
 
-    def generate_url(self) -> str:
+    def generate_url(self, find_anything: bool) -> str:
+        if not find_anything:
+            return "https://sberauto.com/cars?"
         # генерация ссылки относительно входящий параметов
         if self.brand_id and self.city_id and self.model_id:
             city_str = generate_city_str(self.city_id)
@@ -206,11 +212,8 @@ class SberAutoProcessor(SberAutoLoader):
 
     def generate_text_form(self):
         done_str = ""
-        # TODO brand_id не главный и основной критий поиска
         if self.brand_id:
             done_str += "{}".format(models_revers[self.brand_id])
-        # else:
-        #     return None
         if self.model_id:
             done_str += " {}".format(marks_revers[self.model_id])
         if self.city_id:

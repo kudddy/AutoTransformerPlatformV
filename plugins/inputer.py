@@ -95,17 +95,10 @@ def inputter(res: object):
                     }}
 
         # проверяем статус от сберавто по поводу найденых авто
-        if status:
-            if cfg.app.main.redirect_to_mobile:
-                done_url = sber_auto_processor.generate_url_for_mobile()
-            else:
-                done_url = sber_auto_processor.generate_url()
-
+        if cfg.app.main.redirect_to_mobile:
+            done_url = sber_auto_processor.generate_url_for_mobile(status)
         else:
-            if cfg.app.main.redirect_to_mobile:
-                done_url = "https://sberauto.com/app/chat/car_select"
-            else:
-                done_url = "https://sberauto.com/cars?"
+            done_url = sber_auto_processor.generate_url(status)
 
         # TODO слишком влияет на производительность
         if use_tlg_logger:
