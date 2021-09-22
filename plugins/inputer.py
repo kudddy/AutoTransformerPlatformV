@@ -1,11 +1,8 @@
 import logging
 import asyncio
-import time
 
 try:
-    from ..plugins.responder.sberauto import \
-        parse_response, generate_url, \
-        generate_url_for_mobile, generate_text_form
+    from ..plugins.responder.sberauto import SberAutoProcessor
     from ..plugins.responder.autoru import get_search_res_yandex
     from ..plugins.responder.tlg import send_message
     from ..plugins.duckling.typonder import replace_typos
@@ -13,9 +10,7 @@ try:
     from ..plugins.helper import async_get
 
 except Exception as e:
-    from plugins.responder.sberauto import \
-        parse_response, generate_url, \
-        generate_url_for_mobile, generate_text_form
+    from plugins.responder.sberauto import SberAutoProcessor
     from plugins.responder.autoru import get_search_res_yandex
     from plugins.responder.tlg import send_message
     from plugins.duckling.typonder import replace_typos
@@ -47,37 +42,22 @@ def inputter(res: object):
 
         brand_id, model_id, city_id, year_from, year_to = get_search_res_yandex(text)
 
-        # TODO подумать насчет этого условия
+        sber_auto_processor = SberAutoProcessor(
+            brand_id=brand_id,
+            model_id=model_id,
+            city_id=city_id,
+            year_from=year_from,
+            year_to=year_to
+        )
 
-        if brand_id or model_id or city_id or year_from or year_to:
-            # запускаем локальный цикл событий
+        if sber_auto_processor.any_options_found():
 
-            start = time.time()
+            all_responses = sber_auto_processor.run_loop_and_prepare_data()
 
-            responses = loop.run_until_complete(async_get(brand_id=brand_id,
-                                                          city_id=city_id,
-                                                          model_id=model_id,
-                                                          year_from=year_from,
-                                                          year_to=year_to))
-            end = time.time()
+            search_res_text_from = sber_auto_processor.generate_text_form()
 
-            log.debug('response from sberauto took {:.3f} ms'.format((end - start) * 1000.0))
-
-            all_responses: list = []
-            for data in responses:
-                success = data.get("success")
-                if success:
-                    response = data.get("data", {}).get("results", [])
-                    if response:
-                        all_responses.extend(response)
-
-            search_res_text_from = generate_text_form(brand_id=brand_id,
-                                                      city_id=city_id,
-                                                      model_id=model_id,
-                                                      year_from=year_from,
-                                                      year_to=year_to)
-
-            status, min_price, middle_value, max_price, count = parse_response(all_responses)
+            status, min_price, middle_value, max_price, count = sber_auto_processor.get_min_max_middle_from_resp(
+                all_responses)
 
             if count == 0:
                 # TODO грязно
@@ -115,26 +95,10 @@ def inputter(res: object):
                     }}
 
         # проверяем статус от сберавто по поводу найденых авто
-        if status:
-            if cfg.app.main.redirect_to_mobile:
-                done_url = generate_url_for_mobile(brand_id,
-                                                   city_id,
-                                                   model_id,
-                                                   year_from,
-                                                   year_to)
-            else:
-                done_url = generate_url(brand_id,
-                                        city_id,
-                                        model_id,
-                                        year_from,
-                                        year_to)
-            # генерируем текстовую форму
-
+        if cfg.app.main.redirect_to_mobile:
+            done_url = sber_auto_processor.generate_url_for_mobile(status)
         else:
-            if cfg.app.main.redirect_to_mobile:
-                done_url = "https://sberauto.com/app/chat/car_select"
-            else:
-                done_url = "https://sberauto.com/cars?"
+            done_url = sber_auto_processor.generate_url(status)
 
         # TODO слишком влияет на производительность
         if use_tlg_logger:
@@ -175,7 +139,7 @@ def inputter(res: object):
         if use_tlg_logger:
             logger_string: str = "🛑 по токету - {} ошибка - {}".format(text, str(e)[0:4095])
             send_message(url=tlg_logger, text=logger_string, chat_id=81432612)
-        logging.info(f'function done work incorrect')
+        logging.info(f'function done work incorrect with error - {e}')
         return {"MESSAGE_NAME": "GET_DUCKLING_RESULT",
                 "CODE": 504,
                 "STATUS": status,
