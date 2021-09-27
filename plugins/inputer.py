@@ -85,7 +85,7 @@ def inputter(res: object):
                 send_message(url=tlg_logger, text=logger_string, chat_id=81432612)
             log.debug(f'function done work fine but nothing found')
             return {"MESSAGE_NAME": "GET_DUCKLING_RESULT",
-                    "CODE": 404,
+                    "CODE": 504,
                     "STATUS": status,
                     "PAYLOAD": {
                         "result": {
