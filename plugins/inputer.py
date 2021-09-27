@@ -5,15 +5,14 @@ try:
     from ..plugins.responder.sberauto import SberAutoProcessor
     from ..plugins.responder.autoru import get_search_res_yandex
     from ..plugins.responder.tlg import send_message
-    from ..plugins.duckling.typonder import replace_typos
+    from ..plugins.duckling.typonder import replace_typos, prepare_data_tokenize_str
     from ..plugins.config import cfg
     from ..plugins.helper import async_get
-
 except Exception as e:
     from plugins.responder.sberauto import SberAutoProcessor
     from plugins.responder.autoru import get_search_res_yandex
     from plugins.responder.tlg import send_message
-    from plugins.duckling.typonder import replace_typos
+    from plugins.duckling.typonder import replace_typos, prepare_data_tokenize_str
     from plugins.config import cfg
     from plugins.helper import async_get
 
@@ -34,9 +33,10 @@ def inputter(res: object):
     result: dict = {}
     search_res_text_from = None
 
-    text: str = res["data"]["text"]
+    text: list = res["data"]["text"]
 
-    text = replace_typos(text)
+    text = prepare_data_tokenize_str(text)
+
     try:
         log.debug("message_name - %r info - %r", "GET_DUCKLING_RESULT", "token - {}".format(text))
 
@@ -85,7 +85,7 @@ def inputter(res: object):
                 send_message(url=tlg_logger, text=logger_string, chat_id=81432612)
             log.debug(f'function done work fine but nothing found')
             return {"MESSAGE_NAME": "GET_DUCKLING_RESULT",
-                    "CODE": 404,
+                    "CODE": 504,
                     "STATUS": status,
                     "PAYLOAD": {
                         "result": {
