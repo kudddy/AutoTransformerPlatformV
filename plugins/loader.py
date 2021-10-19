@@ -1,4 +1,5 @@
 import json
+import pickle
 
 try:
     with open('function/persistants/marks.json') as f:
@@ -31,3 +32,17 @@ citys_map = {int(k): v for k, v in citys_map.items()}
 marks_revers: dict = {v: k for k, v in marks.items()}
 
 models_revers: dict = {v: k for k, v in models.items()}
+
+####  NEW SEARCH ENGINE
+try:
+    with open('function/persistants/search_engine/city.pickle', 'rb') as f:
+        city = pickle.load(f)
+
+    with open('function/persistants/search_engine/models.pickle', 'rb') as f:
+        model = pickle.load(f)
+except Exception as e:
+    with open('persistants/search_engine/city.pickle', 'rb') as f:
+        city = pickle.load(f)
+
+    with open('persistants/search_engine/models.pickle', 'rb') as f:
+        model = pickle.load(f)

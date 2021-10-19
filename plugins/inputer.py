@@ -8,6 +8,7 @@ try:
     from ..plugins.duckling.typonder import replace_typos, prepare_data_tokenize_str
     from ..plugins.config import cfg
     from ..plugins.helper import async_get
+    from ..plugins.duckling.search_engine import dictionary_string
 except Exception as e:
     from plugins.responder.sberauto import SberAutoProcessor
     from plugins.responder.autoru import get_search_res_yandex
@@ -15,6 +16,7 @@ except Exception as e:
     from plugins.duckling.typonder import replace_typos, prepare_data_tokenize_str
     from plugins.config import cfg
     from plugins.helper import async_get
+    from plugins.duckling.search_engine import dictionary_string
 
 tlg_logger: str = cfg.app.url.tlg
 
@@ -35,12 +37,19 @@ def inputter(res: object):
 
     text: list = res["data"]["text"]
 
+    new_search_engine = res["data"].get("new_search_engine", False)
+
     text = prepare_data_tokenize_str(text)
 
     try:
         log.debug("message_name - %r info - %r", "GET_DUCKLING_RESULT", "token - {}".format(text))
 
-        brand_id, model_id, city_id, year_from, year_to = get_search_res_yandex(text)
+        new_search_engine = True
+
+        if new_search_engine:
+            brand_id, model_id, city_id, year_from, year_to = dictionary_string(text)
+        else:
+            brand_id, model_id, city_id, year_from, year_to = get_search_res_yandex(text)
 
         sber_auto_processor = SberAutoProcessor(
             brand_id=brand_id,
