@@ -24,10 +24,10 @@ class TextYear:
                 if item.group(i):
                     date = int(self.digit.search(item.group(i)).group())
                     if i == 3:
-                        if 1900 < date < self.now.year:
+                        if 1900 < date <= self.now.year:
                             date_from = date
                             date_to = date
-                        elif 1 < date < self.now.year - 2000:
+                        elif 1 <= date <= self.now.year - 2000:
                             date_from = date + 2000
                             date_to = date + 2000
                         else:

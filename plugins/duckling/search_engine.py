@@ -32,7 +32,6 @@ def dictionary_string(user_text):
     result.update(TextCity(text_list(user_text)).handler())
     result.update(TextYear(user_text).handler())
     result.update(TextMoney(user_text).handler())
-    print("мы тут")
     return result.get('brand_id', False), \
            result.get('model_id', False), \
            result.get('city_id', False), \
